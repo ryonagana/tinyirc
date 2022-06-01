@@ -38,7 +38,7 @@ int send_message(int fd, const char* msg, ...)
 
     bytes = bytes < MESSAGE_BUF_SIZ - 1 ? bytes : MESSAGE_BUF_SIZ - 1;
 
-    if(bytes <= MESSAGE_BUF_SIZ-1){
+    if(bytes < MESSAGE_BUF_SIZ-1){
         *(buf+bytes+1) = '\r';
         *(buf+bytes+2) = '\n';
     }else {
