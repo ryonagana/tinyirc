@@ -38,7 +38,7 @@ int send_message(int fd, const char* msg, ...)
         return -1;
     }
 
-    return 0;
+    return l;
 
 }
 
