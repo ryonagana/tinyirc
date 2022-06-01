@@ -1,6 +1,9 @@
 #ifndef SOCK_HEADER
 #define SOCK_HEADER
 
+
+
+
 int sock_start();
 int send_message(int fd, const char *msg,...);
 int sock_connect(int sock_fd, const char* ip, int portnum);

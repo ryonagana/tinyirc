@@ -8,6 +8,8 @@
 #include <unistd.h>
 #include "sock.h"
 
+#define MESSAGE_BUF_SIZ 1024
+
 int sock_start()
 {
     int fd = -1;
@@ -23,16 +25,33 @@ int send_message(int fd, const char* msg, ...)
     va_list lst;
     int bytes = 0;
     va_start(lst,msg);
-    char buf[1024] = {0};
-    bytes = vsnprintf(buf,1024-1,msg,lst);
+    char buf[MESSAGE_BUF_SIZ] = {0};
+    bytes = vsnprintf(buf,MESSAGE_BUF_SIZ-1,msg,lst);
     va_end(lst);
 
-    *(buf+bytes+1) = '\r';
-    *(buf+bytes+2) = '\n';
+    /*
+        if  bytes is lesser than message MESSAGE_BUF_SIZ
+        just concat /r/n
+        or else get the last position and overwrite the text whatever it has
+        and force terminate
+    */
 
+    bytes = bytes < MESSAGE_BUF_SIZ - 1 ? bytes : MESSAGE_BUF_SIZ - 1;
+
+    if(bytes <= MESSAGE_BUF_SIZ-1){
+        *(buf+bytes+1) = '\r';
+        *(buf+bytes+2) = '\n';
+    }else {
+        *(buf+MESSAGE_BUF_SIZ-2) = '\r';
+        *(buf+MESSAGE_BUF_SIZ-1) = '\n';
+        *(buf+MESSAGE_BUF_SIZ) = '\0';
+    }
+
+    //add two extra bytes before send
     bytes += 2;
 
     int l = 0;
+
     if((l=send(fd, buf,bytes,0)) < 0){
         perror("send_message()");
         return -1;
